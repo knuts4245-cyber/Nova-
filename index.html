@@ -1,0 +1,1285 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>NOVA SIEGE</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap');
+
+:root {
+–neon-blue: #00d4ff;
+–neon-orange: #ff6b00;
+–neon-green: #00ff88;
+–neon-red: #ff003c;
+–dark: #060a14;
+–dark2: #0d1426;
+–dark3: #111c35;
+–panel: rgba(0,212,255,0.06);
+–border: rgba(0,212,255,0.2);
+}
+
+- { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+body {
+background: var(–dark);
+font-family: ‘Rajdhani’, sans-serif;
+color: #fff;
+min-height: 100vh;
+overflow: hidden;
+position: relative;
+}
+
+/* STARFIELD BG */
+#starfield {
+position: fixed; inset: 0; z-index: 0; pointer-events: none;
+background: radial-gradient(ellipse at 20% 50%, rgba(0,80,160,0.15) 0%, transparent 60%),
+radial-gradient(ellipse at 80% 20%, rgba(255,107,0,0.08) 0%, transparent 50%),
+var(–dark);
+}
+.star { position:absolute; border-radius:50%; animation: twinkle linear infinite; }
+@keyframes twinkle { 0%,100%{opacity:.2} 50%{opacity:1} }
+
+/* SCREENS */
+.screen { position:fixed; inset:0; z-index:10; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:20px; }
+.screen.hidden { display:none; }
+
+/* MAIN MENU */
+#menu-screen {
+background: linear-gradient(180deg, rgba(6,10,20,0) 0%, rgba(6,10,20,0.95) 40%);
+}
+
+.logo {
+font-family: ‘Orbitron’, monospace;
+font-size: clamp(2.5rem, 10vw, 5rem);
+font-weight: 900;
+letter-spacing: 0.15em;
+background: linear-gradient(135deg, #00d4ff 0%, #ffffff 50%, #ff6b00 100%);
+-webkit-background-clip: text; -webkit-text-fill-color: transparent;
+text-shadow: none;
+animation: logoGlow 3s ease-in-out infinite;
+text-align: center;
+line-height: 1;
+}
+.logo-sub {
+font-family: ‘Orbitron’, monospace;
+font-size: clamp(0.6rem, 2.5vw, 0.9rem);
+letter-spacing: 0.5em;
+color: var(–neon-blue);
+text-align: center;
+margin-top: 6px;
+opacity: 0.7;
+}
+@keyframes logoGlow { 0%,100%{filter:brightness(1)} 50%{filter:brightness(1.3)} }
+
+.menu-art {
+width: min(280px, 70vw);
+height: min(280px, 70vw);
+position: relative;
+margin: 20px 0;
+}
+.orbit-ring {
+position: absolute; border-radius: 50%; border: 1px solid;
+animation: orbit linear infinite;
+top: 50%; left: 50%; transform-origin: center;
+}
+.orbit-ring:nth-child(1) { width:100%;height:100%; margin:-50% 0 0 -50%; border-color: rgba(0,212,255,0.3); animation-duration:8s; }
+.orbit-ring:nth-child(2) { width:70%;height:70%; margin:-35% 0 0 -35%; border-color: rgba(255,107,0,0.4); animation-duration:5s; animation-direction:reverse; }
+.orbit-ring:nth-child(3) { width:40%;height:40%; margin:-20% 0 0 -20%; border-color: rgba(0,255,136,0.4); animation-duration:3s; }
+.core {
+position:absolute; top:50%;left:50%; transform:translate(-50%,-50%);
+width:60px;height:60px; border-radius:50%;
+background: radial-gradient(circle, #fff 0%, var(–neon-blue) 40%, var(–neon-orange) 100%);
+box-shadow: 0 0 40px var(–neon-blue), 0 0 80px rgba(0,212,255,0.3);
+animation: pulse 2s ease-in-out infinite;
+}
+.orbit-dot {
+position:absolute; width:10px;height:10px; border-radius:50%;
+top:50%;left:50%; margin:-5px 0 0 -5px;
+}
+@keyframes orbit { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+@keyframes pulse { 0%,100%{transform:translate(-50%,-50%) scale(1)} 50%{transform:translate(-50%,-50%) scale(1.1)} }
+
+.menu-btns { width:100%; max-width:340px; display:flex; flex-direction:column; gap:12px; }
+
+.btn {
+width:100%; padding:16px 24px;
+font-family:‘Orbitron’,monospace; font-size:0.85rem; font-weight:700; letter-spacing:0.15em;
+border:none; border-radius:4px; cursor:pointer; position:relative; overflow:hidden;
+transition: all 0.2s; text-transform:uppercase;
+-webkit-tap-highlight-color:transparent;
+}
+.btn:active { transform:scale(0.97); }
+
+.btn-primary {
+background: linear-gradient(135deg, var(–neon-blue), #0088aa);
+color: var(–dark);
+box-shadow: 0 0 20px rgba(0,212,255,0.4), 0 4px 15px rgba(0,0,0,0.5);
+}
+.btn-secondary {
+background: var(–panel);
+color: var(–neon-blue);
+border: 1px solid var(–border);
+box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+.btn-orange {
+background: linear-gradient(135deg, var(–neon-orange), #cc5500);
+color: #fff;
+box-shadow: 0 0 20px rgba(255,107,0,0.4);
+}
+.btn-green {
+background: linear-gradient(135deg, var(–neon-green), #00aa55);
+color: var(–dark);
+box-shadow: 0 0 20px rgba(0,255,136,0.4);
+}
+.btn-red {
+background: linear-gradient(135deg, var(–neon-red), #aa0020);
+color: #fff;
+box-shadow: 0 0 20px rgba(255,0,60,0.4);
+}
+.btn-sm {
+padding: 10px 18px; font-size:0.75rem;
+}
+.btn::after {
+content:’’; position:absolute; inset:0;
+background: linear-gradient(180deg, rgba(255,255,255,0.1) 0%, transparent 100%);
+}
+
+/* PANEL */
+.panel {
+background: rgba(13,20,38,0.95);
+border: 1px solid var(–border);
+border-radius: 12px;
+padding: 24px;
+width: 100%; max-width: 380px;
+box-shadow: 0 0 40px rgba(0,212,255,0.1), 0 20px 60px rgba(0,0,0,0.6);
+backdrop-filter: blur(10px);
+}
+
+.panel-title {
+font-family:‘Orbitron’,monospace; font-size:1.1rem; font-weight:700;
+color: var(–neon-blue); letter-spacing:0.15em; text-align:center;
+margin-bottom: 20px; padding-bottom: 12px;
+border-bottom: 1px solid var(–border);
+}
+
+/* LOBBY */
+.code-display {
+background: rgba(0,212,255,0.08);
+border: 2px solid var(–neon-blue);
+border-radius: 8px;
+padding: 16px;
+text-align: center;
+margin: 16px 0;
+}
+.code-label { font-size:0.7rem; letter-spacing:0.3em; color:rgba(255,255,255,0.5); text-transform:uppercase; }
+.code-value {
+font-family:‘Orbitron’,monospace; font-size:2.2rem; font-weight:900;
+color: var(–neon-blue); letter-spacing:0.2em;
+text-shadow: 0 0 20px var(–neon-blue);
+animation: codePulse 2s ease-in-out infinite;
+}
+@keyframes codePulse { 0%,100%{text-shadow:0 0 20px var(–neon-blue)} 50%{text-shadow:0 0 40px var(–neon-blue), 0 0 60px rgba(0,212,255,0.5)} }
+
+.input-field {
+width:100%; padding:14px; background:rgba(0,0,0,0.4);
+border:1px solid var(–border); border-radius:6px;
+color:#fff; font-family:‘Rajdhani’,sans-serif; font-size:1.1rem; font-weight:600;
+letter-spacing:0.2em; text-align:center; text-transform:uppercase;
+outline:none; margin: 8px 0;
+transition: border-color 0.2s;
+}
+.input-field:focus { border-color: var(–neon-blue); box-shadow: 0 0 10px rgba(0,212,255,0.3); }
+.input-field::placeholder { color:rgba(255,255,255,0.2); letter-spacing:0.1em; }
+
+/* PLAYER SLOTS */
+.player-slot {
+display:flex; align-items:center; gap:12px;
+padding:12px; border-radius:8px; margin:8px 0;
+background: rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.08);
+}
+.player-avatar {
+width:44px;height:44px; border-radius:50%;
+display:flex;align-items:center;justify-content:center;
+font-size:1.2rem; flex-shrink:0;
+}
+.player-info { flex:1; }
+.player-name { font-weight:700; font-size:0.95rem; }
+.player-role { font-size:0.75rem; opacity:0.6; text-transform:uppercase; letter-spacing:0.1em; }
+.player-status { font-size:0.7rem; }
+.status-ready { color: var(–neon-green); }
+.status-waiting { color: rgba(255,255,255,0.4); animation: blink 1.5s infinite; }
+@keyframes blink { 0%,100%{opacity:0.4} 50%{opacity:1} }
+
+/* ROLE SELECT */
+.role-cards { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:16px 0; }
+.role-card {
+padding:16px 12px; border-radius:10px; text-align:center; cursor:pointer;
+border:2px solid transparent; transition:all 0.2s;
+background:rgba(0,0,0,0.3);
+-webkit-tap-highlight-color:transparent;
+}
+.role-card.selected { border-color:var(–neon-blue); background:rgba(0,212,255,0.1); }
+.role-icon { font-size:2rem; margin-bottom:8px; }
+.role-name { font-family:‘Orbitron’,monospace; font-size:0.7rem; letter-spacing:0.1em; color:var(–neon-blue); }
+.role-desc { font-size:0.75rem; opacity:0.6; margin-top:4px; line-height:1.3; }
+
+/* GAME MODES */
+.mode-card {
+padding:16px; border-radius:10px; margin:8px 0; cursor:pointer;
+border:2px solid transparent; background:rgba(0,0,0,0.3);
+display:flex; align-items:center; gap:14px;
+transition:all 0.2s;
+-webkit-tap-highlight-color:transparent;
+}
+.mode-card.selected { border-color:var(–neon-orange); background:rgba(255,107,0,0.08); }
+.mode-icon { font-size:2rem; flex-shrink:0; }
+.mode-name { font-family:‘Orbitron’,monospace; font-size:0.75rem; color:var(–neon-orange); letter-spacing:0.1em; }
+.mode-desc { font-size:0.78rem; opacity:0.6; margin-top:3px; line-height:1.3; }
+
+/* GAME SCREEN */
+#game-screen { padding:0; overflow:hidden; }
+
+#game-canvas {
+position:absolute; inset:0; width:100%; height:100%;
+touch-action: none;
+}
+
+.game-hud {
+position:fixed; z-index:20; pointer-events:none;
+}
+.hud-top {
+top:0; left:0; right:0;
+padding: env(safe-area-inset-top, 10px) 12px 10px;
+background: linear-gradient(180deg, rgba(6,10,20,0.95) 0%, transparent 100%);
+display:flex; align-items:center; gap:8px;
+}
+.hud-bottom {
+bottom:0; left:0; right:0;
+padding: 12px 12px env(safe-area-inset-bottom, 12px);
+background: linear-gradient(0deg, rgba(6,10,20,0.95) 0%, transparent 100%);
+pointer-events:all;
+}
+
+.wave-badge {
+font-family:‘Orbitron’,monospace; font-size:0.65rem; letter-spacing:0.1em;
+background:var(–neon-orange); color:var(–dark); padding:4px 10px; border-radius:20px;
+font-weight:700;
+}
+.hp-bar-wrap { flex:1; }
+.hp-label { font-size:0.6rem; opacity:0.5; letter-spacing:0.1em; text-transform:uppercase; margin-bottom:3px; }
+.hp-bar { height:8px; background:rgba(255,255,255,0.1); border-radius:4px; overflow:hidden; }
+.hp-fill { height:100%; border-radius:4px; transition:width 0.3s; background:linear-gradient(90deg,#ff003c,#ff6b00); }
+.hp-fill.high { background:linear-gradient(90deg,#00ff88,#00d4ff); }
+.hp-fill.mid { background:linear-gradient(90deg,#ffcc00,#ff6b00); }
+
+.score-box {
+font-family:‘Orbitron’,monospace; font-size:0.85rem; font-weight:700;
+color:var(–neon-blue); text-align:right; white-space:nowrap;
+}
+.score-box span { font-size:0.55rem; opacity:0.5; display:block; letter-spacing:0.1em; }
+
+/* ABILITY CARDS */
+.ability-row { display:flex; gap:10px; justify-content:center; margin-bottom:8px; }
+.ability-btn {
+flex:1; max-width:100px; padding:12px 6px; border-radius:10px;
+background:rgba(13,20,38,0.95); border:1px solid var(–border);
+display:flex;flex-direction:column;align-items:center;gap:4px;
+cursor:pointer; position:relative; overflow:hidden;
+-webkit-tap-highlight-color:transparent;
+transition:all 0.15s;
+}
+.ability-btn:active { transform:scale(0.94); }
+.ability-btn.on-cooldown { opacity:0.5; }
+.ability-emoji { font-size:1.6rem; }
+.ability-name { font-size:0.55rem; letter-spacing:0.08em; text-transform:uppercase; opacity:0.7; font-weight:600; }
+.ability-cost { font-family:‘Orbitron’,monospace; font-size:0.6rem; color:var(–neon-blue); }
+.cooldown-overlay {
+position:absolute; bottom:0; left:0; right:0;
+background:rgba(0,0,0,0.6); display:flex;align-items:center;justify-content:center;
+font-family:‘Orbitron’,monospace; font-size:1rem; font-weight:700;
+transition:height 0.1s linear;
+}
+
+.energy-row { display:flex; align-items:center; gap:8px; }
+.energy-label { font-size:0.6rem; letter-spacing:0.15em; opacity:0.5; text-transform:uppercase; white-space:nowrap; }
+.energy-bar { flex:1; height:6px; background:rgba(255,255,255,0.1); border-radius:3px; overflow:hidden; }
+.energy-fill { height:100%; background:linear-gradient(90deg,var(–neon-blue),var(–neon-green)); border-radius:3px; transition:width 0.2s; }
+.energy-val { font-family:‘Orbitron’,monospace; font-size:0.7rem; color:var(–neon-blue); white-space:nowrap; }
+
+.partner-row {
+display:flex;align-items:center;gap:8px;margin-top:8px;padding:8px 10px;
+background:rgba(0,0,0,0.4);border-radius:8px;border:1px solid rgba(255,255,255,0.08);
+}
+.partner-dot { width:8px;height:8px;border-radius:50%;background:var(–neon-green);box-shadow:0 0 6px var(–neon-green); flex-shrink:0; }
+.partner-dot.offline { background:#666; box-shadow:none; }
+.partner-name { font-size:0.75rem; font-weight:600; flex:1; }
+.partner-hp-bar { width:60px; height:4px; background:rgba(255,255,255,0.1); border-radius:2px; overflow:hidden; }
+.partner-hp-fill { height:100%; background:var(–neon-green); transition:width 0.3s; }
+
+/* POPUP / OVERLAY */
+.overlay {
+position:fixed;inset:0;z-index:30;display:flex;align-items:center;justify-content:center;
+padding:20px; background:rgba(6,10,20,0.85); backdrop-filter:blur(4px);
+}
+.overlay.hidden { display:none; }
+
+/* RESULT */
+.result-title {
+font-family:‘Orbitron’,monospace; font-size:2rem; font-weight:900;
+text-align:center; margin-bottom:8px;
+}
+.result-title.win { color:var(–neon-green); text-shadow:0 0 30px var(–neon-green); }
+.result-title.loss { color:var(–neon-red); text-shadow:0 0 30px var(–neon-red); }
+.stats-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:16px 0; }
+.stat-box { background:rgba(0,0,0,0.3);border-radius:8px;padding:10px;text-align:center; }
+.stat-num { font-family:‘Orbitron’,monospace; font-size:1.2rem; color:var(–neon-blue); }
+.stat-lbl { font-size:0.65rem; opacity:0.5; letter-spacing:0.1em; text-transform:uppercase; margin-top:3px; }
+
+/* TOAST */
+.toast {
+position:fixed;top:80px;left:50%;transform:translateX(-50%);z-index:50;
+background:rgba(0,212,255,0.15);border:1px solid var(–neon-blue);
+border-radius:20px;padding:8px 20px;
+font-size:0.85rem;font-weight:600;letter-spacing:0.05em;
+animation:toastIn 0.3s ease, toastOut 0.3s ease 1.7s forwards;
+pointer-events:none; white-space:nowrap;
+}
+@keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(-10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+@keyframes toastOut{to{opacity:0;transform:translateX(-50%) translateY(-10px)}}
+
+/* NOTIFICATIONS */
+.notif {
+position:fixed;top:70px;left:50%;transform:translateX(-50%);z-index:40;
+font-family:‘Orbitron’,monospace;font-size:0.7rem;letter-spacing:0.1em;
+padding:6px 16px;border-radius:20px;pointer-events:none;
+animation:toastIn 0.3s ease, toastOut 0.3s ease 1.2s forwards;
+}
+.notif.wave { background:rgba(255,107,0,0.9);color:var(–dark); }
+.notif.heal { background:rgba(0,255,136,0.9);color:var(–dark); }
+.notif.danger { background:rgba(255,0,60,0.9);color:#fff; }
+
+/* DIVIDER */
+.divider { height:1px;background:var(–border);margin:16px 0; }
+
+.text-center{text-align:center}
+.text-sm{font-size:0.8rem;opacity:0.6;line-height:1.5}
+.mt-8{margin-top:8px} .mt-16{margin-top:16px}
+.gap-8{gap:8px}
+.flex{display:flex} .flex-col{flex-direction:column}
+
+.back-btn {
+position:fixed;top:env(safe-area-inset-top,12px);left:12px;z-index:25;
+background:rgba(13,20,38,0.9);border:1px solid var(–border);
+color:#fff;padding:8px 14px;border-radius:6px;font-size:0.8rem;
+cursor:pointer;font-family:‘Rajdhani’,sans-serif;font-weight:600;
+-webkit-tap-highlight-color:transparent;
+}
+
+.badge {
+display:inline-block;padding:2px 8px;border-radius:10px;font-size:0.6rem;
+letter-spacing:0.1em;font-weight:700;text-transform:uppercase;
+}
+.badge-blue{background:rgba(0,212,255,0.2);color:var(–neon-blue);border:1px solid rgba(0,212,255,0.3);}
+.badge-orange{background:rgba(255,107,0,0.2);color:var(–neon-orange);border:1px solid rgba(255,107,0,0.3);}
+.badge-green{background:rgba(0,255,136,0.2);color:var(–neon-green);border:1px solid rgba(0,255,136,0.3);}
+</style>
+
+</head>
+<body>
+
+<div id="starfield"></div>
+
+<!-- ==================== MAIN MENU ==================== -->
+
+<div id="menu-screen" class="screen">
+  <div class="logo">NOVA<br>SIEGE</div>
+  <div class="logo-sub">CO-OP TOWER DEFENSE</div>
+
+  <div class="menu-art">
+    <div class="orbit-ring"></div>
+    <div class="orbit-ring"></div>
+    <div class="orbit-ring"></div>
+    <div class="core"></div>
+  </div>
+
+  <div class="menu-btns">
+    <button class="btn btn-primary" onclick="showScreen('host-screen')">⚡ HOST GAME</button>
+    <button class="btn btn-secondary" onclick="showScreen('join-screen')">🔗 JOIN WITH CODE</button>
+    <button class="btn btn-secondary" onclick="showScreen('solo-screen')">🤖 SOLO PRACTICE</button>
+  </div>
+  <div class="text-sm text-center mt-8" style="opacity:0.35;font-size:0.65rem;letter-spacing:0.1em;">TAP &amp; DEFEND · CO-OP ONLINE</div>
+</div>
+
+<!-- ==================== HOST LOBBY ==================== -->
+
+<div id="host-screen" class="screen hidden">
+  <button class="back-btn" onclick="showScreen('menu-screen')">← BACK</button>
+  <div class="panel">
+    <div class="panel-title">🛡 HOST LOBBY</div>
+
+```
+<div class="code-display">
+  <div class="code-label">YOUR INVITE CODE</div>
+  <div class="code-value" id="host-code">——</div>
+  <div style="font-size:0.7rem;opacity:0.5;margin-top:6px;">Share this with your teammate</div>
+</div>
+
+<button class="btn btn-secondary btn-sm" style="margin-bottom:16px" onclick="copyCode()">📋 COPY CODE</button>
+
+<div class="player-slot">
+  <div class="player-avatar" style="background:linear-gradient(135deg,#00d4ff,#005588)">🧑‍🚀</div>
+  <div class="player-info">
+    <div class="player-name">YOU <span class="badge badge-blue">HOST</span></div>
+    <div class="player-role" id="host-role-label">Select role below</div>
+  </div>
+  <div class="player-status status-ready">✓ READY</div>
+</div>
+
+<div class="player-slot" id="p2-slot">
+  <div class="player-avatar" style="background:rgba(255,255,255,0.05)">👤</div>
+  <div class="player-info">
+    <div class="player-name" style="opacity:0.4">Waiting for player...</div>
+    <div class="player-role" style="opacity:0.3">—</div>
+  </div>
+  <div class="player-status status-waiting" id="p2-status">WAITING</div>
+</div>
+
+<div class="divider"></div>
+
+<div style="font-family:'Orbitron',monospace;font-size:0.65rem;color:var(--neon-blue);letter-spacing:0.1em;margin-bottom:10px;">SELECT YOUR ROLE</div>
+<div class="role-cards">
+  <div class="role-card selected" id="role-gunner" onclick="selectRole('gunner')">
+    <div class="role-icon">🔫</div>
+    <div class="role-name">GUNNER</div>
+    <div class="role-desc">Attack enemies & deploy turrets</div>
+  </div>
+  <div class="role-card" id="role-builder" onclick="selectRole('builder')">
+    <div class="role-icon">🏗</div>
+    <div class="role-name">BUILDER</div>
+    <div class="role-desc">Build walls & repair base</div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<div style="font-family:'Orbitron',monospace;font-size:0.65rem;color:var(--neon-orange);letter-spacing:0.1em;margin-bottom:10px;">GAME MODE</div>
+<div class="mode-card selected" id="mode-survival" onclick="selectMode('survival','mode-survival')">
+  <div class="mode-icon">🌊</div>
+  <div>
+    <div class="mode-name">SURVIVAL WAVES</div>
+    <div class="mode-desc">Survive endless enemy waves. Last as long as possible.</div>
+  </div>
+</div>
+<div class="mode-card" id="mode-blitz" onclick="selectMode('blitz','mode-blitz')">
+  <div class="mode-icon">⚡</div>
+  <div>
+    <div class="mode-name">BLITZ MODE</div>
+    <div class="mode-desc">5 rapid waves, fast enemies. High score challenge.</div>
+  </div>
+</div>
+<div class="mode-card" id="mode-boss" onclick="selectMode('boss','mode-boss')">
+  <div class="mode-icon">💀</div>
+  <div>
+    <div class="mode-name">BOSS RAID</div>
+    <div class="mode-desc">One massive boss with phases. Teamwork essential!</div>
+  </div>
+</div>
+
+<button class="btn btn-green mt-16" id="start-btn" onclick="startGame()">START MISSION</button>
+```
+
+  </div>
+</div>
+
+<!-- ==================== JOIN SCREEN ==================== -->
+
+<div id="join-screen" class="screen hidden">
+  <button class="back-btn" onclick="showScreen('menu-screen')">← BACK</button>
+  <div class="panel">
+    <div class="panel-title">🔗 JOIN GAME</div>
+    <div class="text-sm text-center">Enter the code your teammate shared</div>
+
+```
+<input class="input-field mt-16" id="join-code-input" maxlength="6" placeholder="ABC123" oninput="this.value=this.value.toUpperCase()">
+
+<button class="btn btn-primary mt-8" onclick="joinGame()">JOIN LOBBY</button>
+<div class="divider"></div>
+<div style="font-family:'Orbitron',monospace;font-size:0.65rem;color:var(--neon-blue);letter-spacing:0.1em;margin-bottom:10px;">SELECT YOUR ROLE</div>
+<div class="role-cards">
+  <div class="role-card" id="join-role-gunner" onclick="selectJoinRole('gunner')">
+    <div class="role-icon">🔫</div>
+    <div class="role-name">GUNNER</div>
+    <div class="role-desc">Attack enemies & deploy turrets</div>
+  </div>
+  <div class="role-card selected" id="join-role-builder" onclick="selectJoinRole('builder')">
+    <div class="role-icon">🏗</div>
+    <div class="role-name">BUILDER</div>
+    <div class="role-desc">Build walls & repair base</div>
+  </div>
+</div>
+<div id="join-status" class="text-center mt-8 text-sm" style="color:rgba(255,255,255,0.4)"></div>
+<button class="btn btn-green mt-16" id="join-ready-btn" onclick="joinStart()">JOIN & READY UP</button>
+```
+
+  </div>
+</div>
+
+<!-- ==================== SOLO SCREEN ==================== -->
+
+<div id="solo-screen" class="screen hidden">
+  <button class="back-btn" onclick="showScreen('menu-screen')">← BACK</button>
+  <div class="panel">
+    <div class="panel-title">🤖 SOLO PRACTICE</div>
+    <div class="text-sm text-center">Play alone with an AI partner.<br>All roles unlocked!</div>
+
+```
+<div class="divider"></div>
+<div style="font-family:'Orbitron',monospace;font-size:0.65rem;color:var(--neon-orange);letter-spacing:0.1em;margin-bottom:10px;">GAME MODE</div>
+<div class="mode-card selected" id="solo-mode-survival" onclick="selectSoloMode('survival','solo-mode-survival')">
+  <div class="mode-icon">🌊</div>
+  <div><div class="mode-name">SURVIVAL WAVES</div><div class="mode-desc">Survive endless enemy waves.</div></div>
+</div>
+<div class="mode-card" id="solo-mode-blitz" onclick="selectSoloMode('blitz','solo-mode-blitz')">
+  <div class="mode-icon">⚡</div>
+  <div><div class="mode-name">BLITZ MODE</div><div class="mode-desc">5 rapid waves. High score!</div></div>
+</div>
+<div class="mode-card" id="solo-mode-boss" onclick="selectSoloMode('boss','solo-mode-boss')">
+  <div class="mode-icon">💀</div>
+  <div><div class="mode-name">BOSS RAID</div><div class="mode-desc">One massive boss. Brutal!</div></div>
+</div>
+
+<button class="btn btn-orange mt-16" onclick="startSolo()">LAUNCH SOLO</button>
+```
+
+  </div>
+</div>
+
+<!-- ==================== GAME SCREEN ==================== -->
+
+<div id="game-screen" class="screen hidden">
+  <canvas id="game-canvas"></canvas>
+
+  <!-- TOP HUD -->
+
+  <div class="game-hud hud-top">
+    <div class="wave-badge" id="hud-wave">WAVE 1</div>
+    <div class="hp-bar-wrap">
+      <div class="hp-label">BASE HP</div>
+      <div class="hp-bar"><div class="hp-fill high" id="base-hp-fill" style="width:100%"></div></div>
+    </div>
+    <div class="score-box" id="hud-score">
+      <span>SCORE</span>0
+    </div>
+  </div>
+
+  <!-- BOTTOM HUD -->
+
+  <div class="game-hud hud-bottom">
+    <div class="ability-row" id="ability-row"></div>
+    <div class="energy-row">
+      <div class="energy-label">ENERGY</div>
+      <div class="energy-bar"><div class="energy-fill" id="energy-fill" style="width:50%"></div></div>
+      <div class="energy-val" id="energy-val">50</div>
+    </div>
+    <div class="partner-row">
+      <div class="partner-dot" id="partner-dot"></div>
+      <div class="partner-name" id="partner-name">AI Partner (Builder)</div>
+      <div class="partner-hp-bar"><div class="partner-hp-fill" id="partner-hp-fill" style="width:100%"></div></div>
+    </div>
+  </div>
+
+<button class="back-btn" style="top:auto;bottom:calc(env(safe-area-inset-bottom,10px) + 160px);left:8px;font-size:0.65rem;padding:5px 10px;opacity:0.6" onclick="exitGame()">✕ QUIT</button>
+
+</div>
+
+<!-- ==================== RESULT OVERLAY ==================== -->
+
+<div class="overlay hidden" id="result-overlay">
+  <div class="panel" style="max-width:340px">
+    <div class="result-title" id="result-title">VICTORY!</div>
+    <div class="text-center text-sm" id="result-sub"></div>
+    <div class="stats-grid" id="result-stats"></div>
+    <button class="btn btn-primary mt-8" onclick="playAgain()">PLAY AGAIN</button>
+    <button class="btn btn-secondary mt-8" onclick="showScreen('menu-screen');document.getElementById('result-overlay').classList.add('hidden')">MAIN MENU</button>
+  </div>
+</div>
+
+<script>
+// ======================================================
+// STATE
+// ======================================================
+let hostCode = '';
+let selectedRole = 'gunner';
+let selectedJoinRole = 'builder';
+let gameMode = 'survival';
+let soloMode = 'survival';
+let isSolo = false;
+let p2Joined = false;
+let p2JoinTimer = null;
+
+// GAME STATE
+let gs = {};
+let animFrame = null;
+let canvas, ctx;
+let lastTime = 0;
+
+// ======================================================
+// STARFIELD
+// ======================================================
+function buildStars() {
+  const sf = document.getElementById('starfield');
+  for (let i = 0; i < 80; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    const sz = Math.random() * 2 + 0.5;
+    s.style.cssText = `width:${sz}px;height:${sz}px;left:${Math.random()*100}%;top:${Math.random()*100}%;background:#fff;opacity:${Math.random()*0.5+0.1};animation-duration:${Math.random()*4+2}s;animation-delay:${Math.random()*4}s`;
+    sf.appendChild(s);
+  }
+}
+buildStars();
+
+// ======================================================
+// SCREEN NAV
+// ======================================================
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
+  document.getElementById(id).classList.remove('hidden');
+  if (id === 'host-screen') initHostLobby();
+}
+
+// ======================================================
+// HOST LOBBY
+// ======================================================
+function initHostLobby() {
+  hostCode = Math.random().toString(36).substring(2,8).toUpperCase();
+  document.getElementById('host-code').textContent = hostCode;
+  // Simulate partner joining after random delay (2–6 sec)
+  clearTimeout(p2JoinTimer);
+  p2Joined = false;
+  document.getElementById('p2-slot').innerHTML = `
+    <div class="player-avatar" style="background:rgba(255,255,255,0.05)">👤</div>
+    <div class="player-info"><div class="player-name" style="opacity:0.4">Waiting for player...</div><div class="player-role" style="opacity:0.3">—</div></div>
+    <div class="player-status status-waiting" id="p2-status">WAITING</div>`;
+  p2JoinTimer = setTimeout(() => {
+    p2Joined = true;
+    const names = ['Nova_X','ZephyrOps','CyberJack','StarForge','RiftHunter'];
+    const pname = names[Math.floor(Math.random()*names.length)];
+    const otherRole = selectedRole === 'gunner' ? 'builder' : 'gunner';
+    document.getElementById('p2-slot').innerHTML = `
+      <div class="player-avatar" style="background:linear-gradient(135deg,#ff6b00,#883300)">🧑‍💻</div>
+      <div class="player-info"><div class="player-name">${pname}</div><div class="player-role">${otherRole}</div></div>
+      <div class="player-status status-ready">✓ READY</div>`;
+    showToast('🎮 ' + pname + ' joined your lobby!');
+  }, Math.random() * 4000 + 2000);
+}
+
+function selectRole(role) {
+  selectedRole = role;
+  document.getElementById('role-gunner').classList.toggle('selected', role==='gunner');
+  document.getElementById('role-builder').classList.toggle('selected', role==='builder');
+  document.getElementById('host-role-label').textContent = role === 'gunner' ? 'Gunner — Attacks & Turrets' : 'Builder — Walls & Repairs';
+}
+
+function selectMode(mode, id) {
+  gameMode = mode;
+  document.querySelectorAll('#host-screen .mode-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById(id).classList.add('selected');
+}
+
+function selectSoloMode(mode, id) {
+  soloMode = mode;
+  document.querySelectorAll('#solo-screen .mode-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById(id).classList.add('selected');
+}
+
+function selectJoinRole(role) {
+  selectedJoinRole = role;
+  document.getElementById('join-role-gunner').classList.toggle('selected', role==='gunner');
+  document.getElementById('join-role-builder').classList.toggle('selected', role==='builder');
+}
+
+function copyCode() {
+  if (navigator.clipboard) navigator.clipboard.writeText(hostCode);
+  showToast('📋 Code copied: ' + hostCode);
+}
+
+function startGame() {
+  isSolo = false;
+  clearTimeout(p2JoinTimer);
+  initGame(gameMode, selectedRole, p2Joined ? 'online' : 'ai');
+  showScreen('game-screen');
+}
+
+function startSolo() {
+  isSolo = true;
+  initGame(soloMode, 'gunner', 'ai');
+  showScreen('game-screen');
+}
+
+// ======================================================
+// JOIN FLOW
+// ======================================================
+function joinGame() {
+  const code = document.getElementById('join-code-input').value.trim();
+  if (code.length < 4) { showToast('⚠️ Enter a valid code'); return; }
+  document.getElementById('join-status').textContent = '🔍 Searching for lobby...';
+  setTimeout(() => {
+    document.getElementById('join-status').innerHTML = `✅ Found lobby! Host is ${selectedJoinRole === 'builder' ? 'Gunner' : 'Builder'}`;
+    document.getElementById('join-status').style.color = 'var(--neon-green)';
+  }, 1200);
+}
+
+function joinStart() {
+  const code = document.getElementById('join-code-input').value.trim();
+  if (!code) { joinGame(); return; }
+  isSolo = false;
+  initGame('survival', selectedJoinRole, 'online');
+  showScreen('game-screen');
+}
+
+function exitGame() {
+  cancelAnimationFrame(animFrame);
+  showScreen('menu-screen');
+}
+
+function playAgain() {
+  document.getElementById('result-overlay').classList.add('hidden');
+  initGame(gs.mode, gs.role, gs.partnerType);
+  showScreen('game-screen');
+}
+
+// ======================================================
+// TOAST
+// ======================================================
+function showToast(msg) {
+  const t = document.createElement('div');
+  t.className = 'toast'; t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2200);
+}
+
+function showNotif(msg, type) {
+  const n = document.createElement('div');
+  n.className = 'notif ' + type; n.textContent = msg;
+  document.body.appendChild(n);
+  setTimeout(() => n.remove(), 1800);
+}
+
+// ======================================================
+// GAME ENGINE
+// ======================================================
+const ABILITIES = {
+  gunner: [
+    { name:'SHOOT', emoji:'🔫', cost:5, cooldown:0.3, color:'#00d4ff', action:'shoot' },
+    { name:'TURRET', emoji:'🤖', cost:30, cooldown:8, color:'#ff6b00', action:'turret' },
+    { name:'MISSILE', emoji:'🚀', cost:20, cooldown:5, color:'#ff003c', action:'missile' },
+    { name:'SHIELD', emoji:'🛡', cost:25, cooldown:10, color:'#00ff88', action:'shield' },
+  ],
+  builder: [
+    { name:'WALL', emoji:'🧱', cost:15, cooldown:1, color:'#ff6b00', action:'wall' },
+    { name:'REPAIR', emoji:'🔧', cost:20, cooldown:6, color:'#00ff88', action:'repair' },
+    { name:'BOMB', emoji:'💣', cost:25, cooldown:7, color:'#ff003c', action:'bomb' },
+    { name:'BOOST', emoji:'⚡', cost:30, cooldown:12, color:'#00d4ff', action:'boost' },
+  ]
+};
+
+function initGame(mode, role, partnerType) {
+  cancelAnimationFrame(animFrame);
+  canvas = document.getElementById('game-canvas');
+  ctx = canvas.getContext('2d');
+
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  gs = {
+    mode, role, partnerType,
+    wave: 1, score: 0, kills: 0, energySpent: 0,
+    baseHP: 100, maxHP: 100,
+    energy: 60, maxEnergy: 100,
+    energyRegen: 3.5,
+    partnerHP: 100,
+    paused: false,
+    over: false,
+    shieldActive: false, shieldTimer: 0,
+    boostActive: false, boostTimer: 0,
+    enemies: [], bullets: [], turrets: [], walls: [], explosions: [], particles: [],
+    waveTimer: 0, waveInterval: mode === 'blitz' ? 12 : 20,
+    maxWaves: mode === 'blitz' ? 5 : (mode === 'boss' ? 3 : Infinity),
+    startTime: Date.now(),
+    cooldowns: {},
+    tapX: null, tapY: null, tapAnim: 0,
+  };
+
+  const ab = ABILITIES[role];
+  ab.forEach(a => gs.cooldowns[a.action] = 0);
+
+  buildAbilityRow(role);
+  updateHUD();
+
+  // partner display
+  document.getElementById('partner-name').textContent = partnerType === 'online' ? '🟢 Online Partner' : '🤖 AI Partner';
+  document.getElementById('partner-dot').className = 'partner-dot' + (partnerType === 'online' ? '' : ' offline');
+
+  spawnWave();
+
+  // Canvas tap
+  canvas.ontouchstart = (e) => { e.preventDefault(); handleTap(e.touches[0].clientX, e.touches[0].clientY); };
+  canvas.onmousedown = (e) => handleTap(e.clientX, e.clientY);
+
+  lastTime = performance.now();
+  animFrame = requestAnimationFrame(gameLoop);
+}
+
+function buildAbilityRow(role) {
+  const row = document.getElementById('ability-row');
+  row.innerHTML = '';
+  ABILITIES[role].forEach(a => {
+    const btn = document.createElement('div');
+    btn.className = 'ability-btn';
+    btn.id = 'ab-' + a.action;
+    btn.innerHTML = `<div class="ability-emoji">${a.emoji}</div><div class="ability-name">${a.name}</div><div class="ability-cost" style="color:${a.color}">${a.cost}⚡</div><div class="cooldown-overlay" id="cd-${a.action}" style="height:0"></div>`;
+    btn.ontouchstart = (e) => { e.preventDefault(); e.stopPropagation(); useAbility(a); };
+    btn.onclick = () => useAbility(a);
+    row.appendChild(btn);
+  });
+}
+
+function handleTap(x, y) {
+  gs.tapX = x; gs.tapY = y; gs.tapAnim = 0.5;
+  // Shoot at tap position if gunner
+  if (gs.role === 'gunner' && gs.energy >= 3) {
+    fireBullet(x, y, '#00d4ff', 8, 1, false);
+    gs.energy -= 3;
+    gs.energySpent += 3;
+  }
+}
+
+function useAbility(a) {
+  if (gs.over) return;
+  if (gs.energy < a.cost) { showToast('⚡ Not enough energy!'); return; }
+  if (gs.cooldowns[a.action] > 0) { showToast(`⏱ ${a.name} on cooldown`); return; }
+
+  gs.energy -= a.cost;
+  gs.energySpent += a.cost;
+  gs.cooldowns[a.action] = a.cooldown;
+
+  const cx = canvas.width / 2, cy = canvas.height * 0.45;
+
+  if (a.action === 'shoot') {
+    // shoot at random enemy
+    if (gs.enemies.length > 0) {
+      const e = gs.enemies[Math.floor(Math.random()*gs.enemies.length)];
+      fireBullet(e.x, e.y, '#00d4ff', 12, 3, true);
+    }
+  } else if (a.action === 'turret') {
+    gs.turrets.push({ x: 80 + Math.random()*60, y: canvas.height*0.35 + (Math.random()-0.5)*100, fireTimer:0, fireRate:1.5, dmg:2 });
+    showNotif('🤖 TURRET DEPLOYED', 'wave');
+  } else if (a.action === 'missile') {
+    if (gs.enemies.length > 0) {
+      gs.enemies.forEach(e => spawnExplosion(e.x, e.y, '#ff003c', 30));
+      gs.enemies = gs.enemies.filter(e => { if(Math.random()<0.6){gs.score+=10;gs.kills++;return false;}return true; });
+    }
+    showNotif('🚀 MISSILES LAUNCHED', 'danger');
+  } else if (a.action === 'shield') {
+    gs.shieldActive = true; gs.shieldTimer = 6;
+    showNotif('🛡 SHIELD ACTIVE', 'heal');
+  } else if (a.action === 'wall') {
+    gs.walls.push({ x: canvas.width * 0.55, y: canvas.height*0.3 + gs.walls.length*40, hp:50, maxHp:50 });
+    showNotif('🧱 WALL BUILT', 'wave');
+  } else if (a.action === 'repair') {
+    gs.baseHP = Math.min(gs.maxHP, gs.baseHP + 25);
+    updateHUD();
+    showNotif('🔧 BASE REPAIRED +25HP', 'heal');
+    spawnExplosion(cx, cy, '#00ff88', 20);
+  } else if (a.action === 'bomb') {
+    gs.enemies.forEach(e => { if(Math.random()<0.8){gs.score+=15;gs.kills++;spawnExplosion(e.x,e.y,'#ff6b00',25);} });
+    gs.enemies = gs.enemies.filter(()=>Math.random()>0.8);
+    showNotif('💣 BOMB EXPLODED', 'danger');
+  } else if (a.action === 'boost') {
+    gs.energyRegen = 10; gs.boostActive = true; gs.boostTimer = 8;
+    showNotif('⚡ ENERGY BOOSTED', 'heal');
+  }
+}
+
+function fireBullet(tx, ty, color, speed, dmg, aimed) {
+  const ox = 60, oy = canvas.height * 0.45;
+  const dx = tx - ox, dy = ty - oy;
+  const dist = Math.sqrt(dx*dx+dy*dy)||1;
+  gs.bullets.push({ x:ox, y:oy, vx:dx/dist*speed, vy:dy/dist*speed, color, dmg, r:5, life:1 });
+}
+
+function spawnExplosion(x, y, color, count) {
+  for (let i=0;i<count;i++) {
+    const angle = Math.random()*Math.PI*2;
+    const spd = Math.random()*3+1;
+    gs.particles.push({ x, y, vx:Math.cos(angle)*spd, vy:Math.sin(angle)*spd, color, life:1, size:Math.random()*4+2 });
+  }
+  gs.explosions.push({ x, y, r:0, maxR:60+Math.random()*40, color, life:1 });
+}
+
+function spawnWave() {
+  const mode = gs.mode, wave = gs.wave;
+  let count = 0, speed = 0, hp = 0;
+
+  if (mode === 'boss') {
+    if (wave === 1) { count=8; speed=0.8; hp=20; }
+    else if (wave === 2) { count=15; speed=1.2; hp=30; }
+    else { spawnBoss(); return; }
+  } else if (mode === 'blitz') {
+    count = 6 + wave * 4; speed = 1.2 + wave * 0.3; hp = 8 + wave * 5;
+  } else {
+    count = 4 + wave * 3; speed = 0.6 + wave * 0.15; hp = 10 + wave * 8;
+  }
+
+  const types = ['👾','🤖','👹','🛸','🦾'];
+  for (let i=0;i<count;i++) {
+    const t = types[Math.floor(Math.random()*types.length)];
+    const startY = canvas.height * 0.1 + Math.random() * canvas.height * 0.7;
+    gs.enemies.push({
+      x: canvas.width + 30 + i * 35,
+      y: startY, baseY: startY,
+      vx: -(speed + Math.random()*0.3),
+      vy: 0, hp, maxHp: hp,
+      emoji: t, r: 20, spawnDelay: i * 0.4, timer: 0,
+      wave: Math.sin(Math.random()*Math.PI*2), waveAmp: Math.random()*30+10, waveFreq: Math.random()*2+1
+    });
+  }
+  showNotif(`⚠️ WAVE ${wave} INCOMING!`, 'wave');
+}
+
+function spawnBoss() {
+  gs.enemies.push({
+    x: canvas.width + 100, y: canvas.height/2, baseY: canvas.height/2,
+    vx: -0.4, vy: 0, hp: 400, maxHp: 400,
+    emoji: '💀', r: 50, isBoss: true, spawnDelay: 0, timer: 0,
+    wave: 0, waveAmp: 80, waveFreq: 0.5, phase: 1
+  });
+  showNotif('💀 BOSS INCOMING!', 'danger');
+}
+
+function gameLoop(ts) {
+  if (gs.over) return;
+  const dt = Math.min((ts - lastTime) / 1000, 0.05);
+  lastTime = ts;
+
+  update(dt);
+  render();
+
+  animFrame = requestAnimationFrame(gameLoop);
+}
+
+function update(dt) {
+  // Energy regen
+  gs.energy = Math.min(gs.maxEnergy, gs.energy + gs.energyRegen * dt);
+
+  // Timers
+  if (gs.shieldActive) { gs.shieldTimer -= dt; if(gs.shieldTimer<=0){gs.shieldActive=false;} }
+  if (gs.boostActive) { gs.boostTimer -= dt; if(gs.boostTimer<=0){gs.boostActive=false;gs.energyRegen=3.5;} }
+
+  // Cooldowns
+  Object.keys(gs.cooldowns).forEach(k => { if(gs.cooldowns[k]>0) gs.cooldowns[k]-=dt; });
+
+  // Wave timer
+  if (gs.enemies.length === 0) {
+    gs.waveTimer += dt;
+    if (gs.waveTimer >= (gs.mode==='blitz'?3:4)) {
+      gs.waveTimer = 0;
+      gs.wave++;
+      if (gs.wave > gs.maxWaves && gs.maxWaves !== Infinity) {
+        setTimeout(()=>endGame(true), 500);
+        return;
+      }
+      spawnWave();
+    }
+  }
+
+  // Enemies
+  gs.enemies.forEach(e => {
+    e.timer += dt;
+    if (e.timer < e.spawnDelay) return;
+    e.x += e.vx;
+    e.y = e.baseY + Math.sin((e.timer - e.spawnDelay) * e.waveFreq) * e.waveAmp;
+
+    // Turret fire on enemy
+    gs.turrets.forEach(t => {
+      t.fireTimer -= dt;
+      if (t.fireTimer <= 0) {
+        t.fireTimer = t.fireRate;
+        // find closest enemy
+        const closest = gs.enemies.reduce((a,b) => !a || dist(t,b)<dist(t,a) ? b : a, null);
+        if (closest) {
+          closest.hp -= t.dmg;
+          if(closest.hp<=0){gs.score+=closest.isBoss?500:10;gs.kills++;spawnExplosion(closest.x,closest.y,'#ff6b00',15);}
+        }
+      }
+    });
+
+    // Wall collision
+    gs.walls.forEach(w => {
+      if (Math.abs(e.x - w.x) < 15 && Math.abs(e.y - w.y) < 40) {
+        w.hp -= 5 * dt * 60;
+        e.vx *= 0.5;
+      }
+    });
+    gs.walls = gs.walls.filter(w => w.hp > 0);
+
+    // Enemy reaches base
+    if (e.x < 55) {
+      if (!gs.shieldActive) {
+        const dmg = e.isBoss ? 15 : 5;
+        gs.baseHP -= dmg;
+        updateHUD();
+        spawnExplosion(50, e.y, '#ff003c', 10);
+      }
+      e.hp = 0;
+    }
+  });
+
+  // Remove dead enemies
+  gs.enemies = gs.enemies.filter(e => {
+    if (e.hp <= 0) { spawnExplosion(e.x, e.y, e.isBoss?'#ff003c':'#ff6b00', e.isBoss?40:12); gs.score+=e.isBoss?500:10; gs.kills++; return false; }
+    return true;
+  });
+
+  // Bullets
+  gs.bullets.forEach(b => {
+    b.x += b.vx; b.y += b.vy; b.life -= dt;
+    gs.enemies.forEach(e => {
+      if (dist(b, e) < e.r + b.r) { e.hp -= b.dmg; b.life = 0; }
+    });
+  });
+  gs.bullets = gs.bullets.filter(b => b.life > 0 && b.x > 0 && b.x < canvas.width);
+
+  // Particles
+  gs.particles.forEach(p => { p.x+=p.vx; p.y+=p.vy; p.vy+=0.1; p.life-=dt*1.5; });
+  gs.particles = gs.particles.filter(p=>p.life>0);
+
+  // Explosions
+  gs.explosions.forEach(ex => { ex.r += 150*dt; ex.life -= dt*2; });
+  gs.explosions = gs.explosions.filter(ex=>ex.life>0);
+
+  // Tap anim
+  if (gs.tapAnim > 0) gs.tapAnim -= dt * 2;
+
+  // AI partner simulates activity
+  if (Math.random() < 0.005 && gs.enemies.length > 0) {
+    const e = gs.enemies[0];
+    spawnExplosion(e.x, e.y, '#00ff88', 8);
+    e.hp -= 15;
+    gs.partnerHP = Math.max(20, gs.partnerHP - Math.random() * 3);
+    document.getElementById('partner-hp-fill').style.width = gs.partnerHP + '%';
+  }
+
+  // Game over check
+  if (gs.baseHP <= 0) { gs.baseHP = 0; updateHUD(); setTimeout(()=>endGame(false),300); gs.over = true; }
+
+  updateHUD();
+}
+
+function dist(a,b){const dx=a.x-b.x,dy=a.y-b.y;return Math.sqrt(dx*dx+dy*dy);}
+
+function render() {
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0,0,W,H);
+
+  // Background gradient
+  const bg = ctx.createLinearGradient(0,0,W,H);
+  bg.addColorStop(0,'#060a14');
+  bg.addColorStop(1,'#0a1020');
+  ctx.fillStyle = bg;
+  ctx.fillRect(0,0,W,H);
+
+  // Grid lines
+  ctx.strokeStyle = 'rgba(0,212,255,0.04)';
+  ctx.lineWidth = 1;
+  for(let x=0;x<W;x+=40){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+  for(let y=0;y<H;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+
+  // BASE
+  const baseX = 40, baseY = H*0.45;
+  ctx.save();
+  const baseGrad = ctx.createRadialGradient(baseX,baseY,0,baseX,baseY,50);
+  baseGrad.addColorStop(0,'rgba(0,212,255,0.3)');
+  baseGrad.addColorStop(1,'transparent');
+  ctx.fillStyle = baseGrad;
+  ctx.fillRect(0, baseY-80, 80, 160);
+
+  // Shield bubble
+  if (gs.shieldActive) {
+    ctx.beginPath(); ctx.arc(baseX, baseY, 70, 0, Math.PI*2);
+    ctx.strokeStyle = `rgba(0,255,136,${0.5+Math.sin(Date.now()*0.01)*0.3})`;
+    ctx.lineWidth = 3; ctx.stroke();
+    ctx.fillStyle = 'rgba(0,255,136,0.05)'; ctx.fill();
+  }
+
+  // Base structure
+  ctx.fillStyle = '#0d1a35';
+  ctx.strokeStyle = gs.shieldActive ? '#00ff88' : '#00d4ff';
+  ctx.lineWidth = 2;
+  roundRect(ctx, baseX-25, baseY-55, 50, 110, 8, true, true);
+  ctx.fillStyle = gs.shieldActive ? '#00ff88' : '#00d4ff';
+  ctx.font = '28px serif'; ctx.textAlign='center';
+  ctx.fillText('🏰', baseX, baseY+10);
+
+  ctx.restore();
+
+  // WALLS
+  gs.walls.forEach(w => {
+    ctx.save();
+    const pct = w.hp/w.maxHp;
+    ctx.fillStyle = `rgba(255,107,0,${0.2+pct*0.3})`;
+    ctx.strokeStyle = `rgba(255,107,0,${0.5+pct*0.5})`;
+    ctx.lineWidth = 2;
+    roundRect(ctx, w.x-10, w.y-30, 20, 60, 4, true, true);
+    ctx.font='18px serif'; ctx.textAlign='center';
+    ctx.fillText('🧱', w.x, w.y+6);
+    ctx.restore();
+  });
+
+  // TURRETS
+  gs.turrets.forEach(t => {
+    ctx.font='24px serif'; ctx.textAlign='center';
+    ctx.fillText('🤖', t.x, t.y+8);
+    // Turret glow
+    const tg = ctx.createRadialGradient(t.x,t.y,0,t.x,t.y,30);
+    tg.addColorStop(0,'rgba(255,107,0,0.15)'); tg.addColorStop(1,'transparent');
+    ctx.fillStyle=tg; ctx.beginPath(); ctx.arc(t.x,t.y,30,0,Math.PI*2); ctx.fill();
+  });
+
+  // EXPLOSIONS
+  gs.explosions.forEach(ex => {
+    ctx.save(); ctx.globalAlpha = ex.life * 0.4;
+    const eg = ctx.createRadialGradient(ex.x,ex.y,0,ex.x,ex.y,ex.r);
+    eg.addColorStop(0,ex.color); eg.addColorStop(1,'transparent');
+    ctx.fillStyle=eg; ctx.beginPath(); ctx.arc(ex.x,ex.y,ex.r,0,Math.PI*2); ctx.fill();
+    ctx.restore();
+  });
+
+  // PARTICLES
+  gs.particles.forEach(p => {
+    ctx.save(); ctx.globalAlpha=p.life;
+    ctx.fillStyle=p.color;
+    ctx.beginPath(); ctx.arc(p.x,p.y,p.size*p.life,0,Math.PI*2); ctx.fill();
+    ctx.restore();
+  });
+
+  // BULLETS
+  gs.bullets.forEach(b => {
+    ctx.save();
+    const bg2 = ctx.createRadialGradient(b.x,b.y,0,b.x,b.y,b.r*2);
+    bg2.addColorStop(0,'#fff'); bg2.addColorStop(0.5,b.color); bg2.addColorStop(1,'transparent');
+    ctx.fillStyle=bg2;
+    ctx.beginPath(); ctx.arc(b.x,b.y,b.r*2,0,Math.PI*2); ctx.fill();
+    ctx.restore();
+  });
+
+  // ENEMIES
+  gs.enemies.forEach(e => {
+    if (e.timer < e.spawnDelay) return;
+    ctx.save();
+    const sz = e.isBoss ? 2.5 : 1.3;
+    ctx.font = `${Math.floor(28*sz)}px serif`;
+    ctx.textAlign='center';
+    ctx.fillText(e.emoji, e.x, e.y+8);
+
+    // HP bar
+    if (!e.isBoss) {
+      const bw=30, bh=4;
+      ctx.fillStyle='rgba(0,0,0,0.5)'; ctx.fillRect(e.x-bw/2, e.y-e.r-8, bw, bh);
+      const pct = e.hp/e.maxHp;
+      ctx.fillStyle = pct > 0.5 ? '#00ff88' : pct > 0.25 ? '#ffcc00' : '#ff003c';
+      ctx.fillRect(e.x-bw/2, e.y-e.r-8, bw*pct, bh);
+    } else {
+      // Boss HP bar big
+      const bw=140, bh=10;
+      ctx.fillStyle='rgba(0,0,0,0.7)'; roundRect(ctx,e.x-bw/2, e.y-70, bw, bh, 3, true);
+      const pct=e.hp/e.maxHp;
+      ctx.fillStyle=pct>0.5?'#ff003c':'#ff6b00';
+      roundRect(ctx,e.x-bw/2, e.y-70, bw*pct, bh, 3, true);
+      ctx.fillStyle='#fff'; ctx.font='bold 10px Rajdhani'; ctx.textAlign='center';
+      ctx.fillText('BOSS  ' + e.hp + '/' + e.maxHp, e.x, e.y-74);
+    }
+    ctx.restore();
+  });
+
+  // TAP RIPPLE
+  if (gs.tapX && gs.tapAnim > 0) {
+    ctx.save(); ctx.globalAlpha=gs.tapAnim*0.8;
+    ctx.strokeStyle='#00d4ff'; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.arc(gs.tapX, gs.tapY, (1-gs.tapAnim)*40, 0, Math.PI*2); ctx.stroke();
+    ctx.restore();
+  }
+
+  // Cooldown overlays
+  ABILITIES[gs.role].forEach(a => {
+    const el = document.getElementById('cd-'+a.action);
+    if (!el) return;
+    const cd = gs.cooldowns[a.action];
+    if (cd > 0) {
+      const pct = cd / a.cooldown;
+      el.style.height = (pct*100)+'%';
+      el.textContent = Math.ceil(cd);
+    } else {
+      el.style.height = '0';
+      el.textContent = '';
+    }
+  });
+}
+
+function roundRect(ctx, x, y, w, h, r, fill, stroke) {
+  ctx.beginPath();
+  ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y);
+  ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+  ctx.lineTo(x+w,y+h-r); ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+  ctx.lineTo(x+r,y+h); ctx.quadraticCurveTo(x,y+h,x,y+h-r);
+  ctx.lineTo(x,y+r); ctx.quadraticCurveTo(x,y,x+r,y);
+  ctx.closePath();
+  if(fill) ctx.fill();
+  if(stroke) ctx.stroke();
+}
+
+function updateHUD() {
+  document.getElementById('hud-wave').textContent = gs.mode==='boss' && gs.wave>gs.maxWaves ? 'BOSS!' : `WAVE ${gs.wave}`;
+  document.getElementById('hud-score').innerHTML = `<span>SCORE</span>${gs.score.toLocaleString()}`;
+
+  const pct = gs.baseHP / gs.maxHP;
+  const fill = document.getElementById('base-hp-fill');
+  fill.style.width = (pct*100)+'%';
+  fill.className = 'hp-fill ' + (pct > 0.6 ? 'high' : pct > 0.3 ? 'mid' : '');
+
+  const ePct = gs.energy / gs.maxEnergy;
+  document.getElementById('energy-fill').style.width = (ePct*100)+'%';
+  document.getElementById('energy-val').textContent = Math.floor(gs.energy);
+}
+
+function endGame(won) {
+  gs.over = true;
+  cancelAnimationFrame(animFrame);
+
+  const elapsed = Math.floor((Date.now() - gs.startTime) / 1000);
+  const mins = Math.floor(elapsed/60), secs = elapsed%60;
+
+  document.getElementById('result-title').textContent = won ? '🎉 VICTORY!' : '💀 DEFEATED';
+  document.getElementById('result-title').className = 'result-title ' + (won?'win':'loss');
+  document.getElementById('result-sub').textContent = won ? `You survived all ${gs.maxWaves} waves!` : `Base fell on Wave ${gs.wave}`;
+
+  document.getElementById('result-stats').innerHTML = `
+    <div class="stat-box"><div class="stat-num">${gs.score.toLocaleString()}</div><div class="stat-lbl">Score</div></div>
+    <div class="stat-box"><div class="stat-num">${gs.kills}</div><div class="stat-lbl">Kills</div></div>
+    <div class="stat-box"><div class="stat-num">${gs.wave}</div><div class="stat-lbl">Wave</div></div>
+    <div class="stat-box"><div class="stat-num">${mins}:${secs.toString().padStart(2,'0')}</div><div class="stat-lbl">Time</div></div>
+  `;
+
+  document.getElementById('result-overlay').classList.remove('hidden');
+}
+
+// Resize
+window.addEventListener('resize', () => {
+  if (canvas) { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+});
+</script>
+
+</body>
+</html>
